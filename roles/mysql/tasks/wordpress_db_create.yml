@@ -1,0 +1,12 @@
+---
+- name: Create wordpress Database
+  mysql_db: 
+     name: "{{ wordpress_db }}"
+     state: present
+
+- name: Create wordpress database user and give privileges
+  mysql_user:
+    name: "{{ wordpress_db_user }}"
+    host: localhost
+    password: "{{ wordpress_db_passwd }}"
+    priv: "{{ wordpress_db }}.*:ALL"

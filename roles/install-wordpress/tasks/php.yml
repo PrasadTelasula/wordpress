@@ -1,0 +1,8 @@
+---
+- name: Install PHP
+  yum: 
+     name: "{{ item }}"
+     state: latest
+  with_items: 
+    - php
+    - php-mysql

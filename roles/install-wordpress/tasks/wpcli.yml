@@ -1,0 +1,60 @@
+---
+- name: Ensure wp-cli Installed or not
+  stat:
+     path: "{{ wp_cli_binary_path }}"
+  register: wp_install
+
+- name: Download wp-cli
+  get_url: 
+      dest: "{{ wp_cli_binary_path }}"
+      url: "{{ wp_cli_download_url }}"
+      mode: "a+x"
+  when: wp_install.stat.exists == false
+
+- name: Get the wp info
+  command: wp --info
+  become_user: "{{ ansible_user }}"
+  register: wpinfo
+
+- debug: var=wpinfo.stdout_lines
+
+
+- name: Create wordpress directory
+  file:
+     path: "{{ wordpress_install_path }}"
+     state: directory
+     owner: "{{ ansible_user }}"
+
+- name: Check wordpress stat
+  stat:
+     path: "{{ wordpress_install_path }}/index.php"
+  register: wp_core_downloaded 
+
+- name: Download wp core packages
+  command: "wp core download --allow-root --locale=en_US --version={{ wordpress_version }}"
+  become_user: "{{ ansible_user }}"
+  args: 
+      chdir: "{{ wordpress_install_path }}"
+  when: wp_core_downloaded.stat.exists == false
+
+- name: Copy wp config file
+  template:
+     src: wp-config.php.j2 
+     dest: "{{ wordpress_install_path }}wp-config.php"  
+
+- name: Remove Sample wordpress config file
+  file: 
+      path: "{{ wordpress_install_path }}wp-config-sample.php"
+      state: absent
+
+- name: Install Wordpress 
+  command: "wp core install --allow-root --title='{{ wordpress_title }}' --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_pwd }} --admin_email='{{ wordpress_admin_email }}' --url='{{ wordpress_url }}' --skip-email" 
+  args:
+      chdir: "{{ wordpress_install_path }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Install theme
+  command: wp theme install twentysixteen --activate
+  args:
+      chdir: "{{ wordpress_install_path }}"
+  become_user: "{{ ansible_user }}"
