@@ -1,0 +1,14 @@
+---
+- name: Allow SELinux for Apache to connect to Database
+  seboolean:
+    name: httpd_can_network_connect_db
+    state: yes
+    persistent: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Allow SELinux for Mariadb 
+  seboolean:
+    name: selinuxuser_mysql_connect_enabled
+    state: yes
+    persistent: yes
+  when: ansible_distribution == "CentOS"

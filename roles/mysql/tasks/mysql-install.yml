@@ -1,13 +1,31 @@
 ---
-- name: Install MariaDB
+- name: Install MySQL
   yum:
     name: "{{ item }}"
     state: present
   with_items:
      - "mysql"
      - "mysql-server"
+  when: ansible_distribution == "Amazon"
+
+- name: Install MariaDB
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+     - "mariadb"
+     - "mariadb-server"
+  when: ansible_distribution == "CentOS"
+
+
 - name: Install MySQLDB python package for secure installations.
   yum:
     name: MySQL-python27
     state: present
- # when: mysql_secure_installation and mysql_root_password is defined
+  when: ansible_distribution == "Amazon"
+
+- name: Install MySQLDB python package for secure installations.
+  yum:
+    name: MySQL-python
+    state: present
+  when: ansible_distribution == "CentOS"

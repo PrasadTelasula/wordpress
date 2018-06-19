@@ -1,11 +1,19 @@
 ---
 - include_tasks: mysql-install.yml
 
-- name: Start and enable service
+- name: Start and enable MySQL service
   service: 
      name: mysqld
      state: started
      enabled: yes
+  when: ansible_distribution == "Amazon"
+
+- name: Start and enable MariaDB service
+  service: 
+     name: mariadb
+     state: started
+     enabled: yes
+  when: ansible_distribution == "CentOS"
 
 - include_tasks: mysql_secure_installation.yml
 

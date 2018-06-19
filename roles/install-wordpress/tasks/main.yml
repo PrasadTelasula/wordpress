@@ -1,3 +1,4 @@
 ---
 - include_tasks: php.yml
 - include_tasks: wpcli.yml
+- include_tasks: selinux.yml
